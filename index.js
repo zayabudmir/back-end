@@ -1,87 +1,87 @@
-import express, { json, request, response } from "express";
+import express, { json } from "express";
 import { v4 as uuidv4 } from "uuid";
 
-const port = 8080;
-
 const app = express();
+const port = 8080;
 
 app.use(json());
 
 let users = [];
 
+// CREATE
 app.post("/user/create", (request, response) => {
-  const { username, gender, age, email } = request.body;
-  console.log(username, gender, age, email, "body");
-  users.push({
+  const { username, gender, age, email, phone } = request.body;
+  const newUser = {
+    id: uuidv4(),
     username,
     gender,
     age,
     email,
-    id: uuidv4(),
-  });
+    phone,
+  };
+  users.push(newUser);
 
   console.log(users, "users");
   response.send({
     success: true,
-    message: "Done",
+    message: "User created",
+    user: newUser,
   });
 });
 
+// ALL USERS
 app.get("/users", (_, response) => {
   response.send(users);
 });
 
+// ONE USER (ID)
 app.get("/user", (request, response) => {
   const { id } = request.body;
   console.log(request.body, "request");
-  const user = users.find((user) => {
-    return user.id == id;
-  });
+  const user = users.find((user) => user.id === id);
 
-  console.log(user);
+  if (!user) {
+    return response.status(404).send({
+      success: false,
+      message: "User not found",
+    });
+  }
+
   response.send(user);
-
-  // response.send(user[0]);
-
-  // const filter = users.filter((value) => value.email === email);
-
-  // response.send(filter);
 });
 
+// DELETE
 app.delete("/user/delete", (request, response) => {
   const { id } = request.body;
   users = users.filter((user) => user.id !== id);
   response.send({
     success: true,
-    message: "removed",
+    message: "User deleted",
   });
 });
 
-app.put("/user/update", (req, res) => {
-  const { id, username, email, gender, age } = req.body;
+// UPDATE
+app.put("/user/update", (request, response) => {
+  const { id, username, email, gender, age, phone } = request.body;
 
   users.map((user) => {
     if (user.id === id) {
       user.username = username;
-      user.email == email;
-      user.gender == gender;
-      user.age == age;
+      user.email = email;
+      user.gender = gender;
+      user.age = age;
+      user.phone = phone;
     }
-    return;
+    return user;
   });
 
-  // const { id } = request.body;
-  // users = users.filter((user) => user.id == id);
   response.send({
     success: true,
-    message: "uo",
+    message: "User updated",
   });
 });
 
-app.get("/", (request, response) => {
-  response.send("hello world");
-});
-
+// Start server
 app.listen(port, () => {
-  console.log(`Server running atv http://localhost:${port}/`);
+  console.log(`✅ Server running at http://localhost:${port}`);
 });
