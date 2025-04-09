@@ -1,15 +1,14 @@
 import express, { json } from "express";
 import { userRouter } from "./routes/user.js";
+import { orderRouter } from "./routes/order.js";
 
 const app = express();
 const port = 8080;
 
-app.use(json());
+app.use(express.json());
 
-let orders = [];
-let users = [];
-
-app.use(userRouter);
+app.use("/users", userRouter);
+app.use("/orders", orderRouter);
 
 // Start server
 app.listen(port, () => {

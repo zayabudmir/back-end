@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-const users = [];
+let users = [];
 
-export const createUser = (request, response) => {
-  const { username, gender, age, email, phone } = request.body;
-
+export const postCreateUser = (req, res) => {
+  const { username, gender, age, email, phone } = req.body;
   const newUser = {
     id: uuidv4(),
     username,
@@ -14,61 +13,66 @@ export const createUser = (request, response) => {
   };
   users.push(newUser);
 
-  console.log(users, "users");
-  response.send({
+  res.send({
     success: true,
     message: "User created",
     user: newUser,
   });
 };
 
-export const getUsers = (_, response) => {
-  response.send(users);
+export const getUsers = (_, res) => {
+  res.send(users);
 };
 
-export const getUserById = (request, response) => {
-  const { id } = request.params;
-  console.log(request.body, "request");
+export const getUserById = (req, res) => {
+  const { id } = req.params;
+
   const user = users.find((user) => user.id === id);
 
   if (!user) {
-    return response.status(404).send({
+    return res.status(404).send({
       success: false,
       message: "User not found",
     });
   }
 
-  response.send(user);
+  res.send({
+    success: true,
+    user,
+  });
 };
 
-export const getUserDelete = (request, response) => {
-  const { id } = request.params;
+export const deleteUserById = (req, res) => {
+  const { id } = req.params;
   users = users.filter((user) => user.id !== id);
-  response.send({
+  res.send({
     success: true,
     message: "User deleted",
   });
 };
 
-export const userUpdate = (request, response) => {
-  const { id, username, email, gender, age, phone } = request.body;
-  let result = {};
-  users.map((user) => {
-    if (user.id === id) {
-      user.username = username;
-      user.email = email;
-      user.gender = gender;
-      user.age = age;
-      user.phone = phone;
-      result = { ...user };
-    } else {
-    }
-    return user;
-  });
+export const putUserByIdUpdate = (req, res) => {
+  const { id } = req.params;
+  const { username, email, gender, age, phone } = req.body;
 
-  response.send({
+  const user = users.find((user) => user.id === id);
+
+  if (!user) {
+    return res.status(404).send({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  user.username = username;
+  user.email = email;
+  user.gender = gender;
+  user.age = age;
+  user.phone = phone;
+
+  res.send({
     success: true,
-    data: result,
     message: "User updated",
+    user,
   });
 };

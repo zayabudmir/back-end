@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-const orders = [];
+let orders = [];
 
-export const createOrder = (request, response) => {
-  const { userId, food, price } = request.body;
-
+export const postCreateOrder = (req, res) => {
+  const { userId, food, price } = req.body;
   const newOrder = {
     id: uuidv4(),
     userId,
@@ -15,54 +14,63 @@ export const createOrder = (request, response) => {
   };
   orders.push(newOrder);
 
-  response.send({
+  res.send({
     success: true,
     message: "Order created",
     order: newOrder,
   });
 };
 
-export const getOrders = (_, response) => {
-  response.send(orders);
+export const getOrders = (_, res) => {
+  res.send(orders);
 };
 
-export const getOrderById = (request, response) => {
-  const { id } = request.body;
+export const getOrderById = (req, res) => {
+  const { id } = req.params;
   const order = orders.find((order) => order.id === id);
 
   if (!order) {
-    return response.status(404).send({
+    return res.status(404).send({
       success: false,
       message: "Order not found",
     });
   }
 
-  response.send(order);
+  res.send({
+    success: true,
+    order,
+  });
 };
 
-export const getOrderDelete = (request, response) => {
-  const { id } = request.body;
+export const deleteOrderById = (req, res) => {
+  const { id } = req.params;
   orders = orders.filter((order) => order.id !== id);
-  response.send({
+  res.send({
     success: true,
     message: "Order deleted",
   });
 };
 
-export const orderUpdate = (request, response) => {
-  const { id, food } = request.body;
-  let result = {};
-  orders.map((order) => {
-    if (order.id === id) {
-      order.food = food;
-      result = { ...order };
-    }
-    return order;
-  });
+export const putOrderByIdUpdate = (req, res) => {
+  const { id } = req.params;
+  const { food, price } = req.body;
 
-  response.send({
+  const order = orders.find((order) => order.id === id);
+
+  if (!order) {
+    return res.status(404).send({
+      success: false,
+      message: "Order not found",
+    });
+  }
+
+  order.food = food;
+  order.price = price;
+  order.updatedAt = new Date();
+
+  res.send({
     success: true,
-    data: result,
     message: "Order updated",
+    order,
   });
 };

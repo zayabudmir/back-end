@@ -1,17 +1,17 @@
 import express from "express";
 import {
-  createUser,
-  userUpdate,
-  getUserById,
-  getUserDelete,
+  postCreateUser,
   getUsers,
+  getUserById,
+  deleteUserById,
+  putUserByIdUpdate,
 } from "../controller/user.js";
 
 export const userRouter = express.Router();
 
 userRouter
-  .post("/", createUser)
+  .post("/", postCreateUser)
   .get("/", getUsers)
   .get("/:id", getUserById)
-  .delete("/:id", getUserDelete)
-  .put("/", userUpdate);
+  .delete("/:id", deleteUserById)
+  .put("/:id", putUserByIdUpdate);
