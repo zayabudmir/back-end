@@ -14,4 +14,4 @@ orderRouter
   .get("/", getOrders)
   .get("/:id", getOrderById)
   .delete("/:id", deleteOrderById)
-  .put("/:", putOrderByIdUpdate);
+  .put("/:id", putOrderByIdUpdate);
